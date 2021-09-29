@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useWeb3React } from "@web3-react/core";
+import React from "react";
+import "./App.css";
+import Nfts from "./components/Nfts";
+import { injected } from "./components/wallet/connectors";
 
-function App() {
+const App = () => {
+  const {
+    active,
+    account,
+    library,
+    connector,
+    activate,
+    deactivate,
+  } = useWeb3React();
+
+  const connect = async () => {
+    try {
+      await activate(injected);
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  const disconnect = async () => {
+    try {
+      deactivate();
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={connect}>Connect to MetaMask</button>
+      {active ? (
+        <span>
+          Connected with <b>{account}</b>
+          <Nfts />
+        </span>
+      ) : (
+        <span>Not connected</span>
+      )}
+      <button onClick={disconnect}>Disconnect</button>
     </div>
   );
-}
+};
 
 export default App;
