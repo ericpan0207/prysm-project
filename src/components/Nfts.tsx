@@ -1,38 +1,67 @@
 import { ImageList, ImageListItem } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import { createStyles, makeStyles } from "@mui/styles";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { getAssets } from "../actions/opensea/opensea";
 import { RootReducer } from "../reducers";
 import { Asset } from "../types/opensea";
 
 interface Prop {
-  getAssets: (owner: string) => void;
   assets: Asset[];
+  currentUser: string;
 }
 
-const Nfts: React.FC<Prop> = ({ getAssets, assets }: Prop) => {
-  useEffect(() => {
-    getAssets("0xCba1A275e2D858EcffaF7a87F606f74B719a8A93");
-  }, [getAssets]);
+const useStyles = makeStyles(() =>
+  createStyles({
+    container: {
+      alignItems: "center",
+      marginTop: "2em",
+      marginLeft: "1em",
+      marginRight: "1em",
+    },
+  })
+);
+
+const Nfts: React.FC<Prop> = ({ currentUser, assets }: Prop) => {
+  const classes = useStyles();
+
+  useEffect(() => {}, [currentUser]);
 
   return (
     <>
-      <Typography variant="body2" color="text.secondary" align="center">
-        User NFTs
-      </Typography>
+      <div className={classes.container}>
+        {assets && assets.length > 0 ? (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            align="center"
+            marginTop={"1em"}
+            fontSize={18}
+          >
+            {currentUser?.substring(0, 6) +
+              "..." +
+              currentUser?.substring(currentUser.length - 4)}
+            's NFTs
+          </Typography>
+        ) : null}
 
-      <ImageList>
-        {assets.map((asset) => (
-          <ImageListItem key={asset.image_url}>
-            <img
-              src={`${asset.image_url}?w=164&h=164&fit=crop&auto=format`}
-              alt={"user NFT"}
-              loading="lazy"
-            />
-          </ImageListItem>
-        ))}
-      </ImageList>
+        <ImageList cols={3} rowHeight={500}>
+          {assets.map((asset) => (
+            <ImageListItem key={asset.image_url}>
+              <img
+                src={`${asset.image_url}?w=164&h=164&fit=crop&auto=format`}
+                alt={"user NFT"}
+                loading="lazy"
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
+        {assets.length == 0 ? (
+          <Typography variant="body2" color="text.secondary" align="center">
+            No NFTs found
+          </Typography>
+        ) : null}
+      </div>
     </>
   );
 };
@@ -40,8 +69,4 @@ const mapStateToProps = (state: RootReducer) => ({
   assets: state.opensea.assets,
 });
 
-const mapDispatchToProps = {
-  getAssets,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Nfts);
+export default connect(mapStateToProps)(Nfts);
